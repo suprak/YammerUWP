@@ -9,12 +9,14 @@ That being said, there's a bunch of things not implemented (ex. Polls). There's 
 In the process I ended up learning some cool XAML patterns and tricks.
 I tried to keep the code as clean and legible as possible. You should be able to find useful things,
 - Swipe left/right list items
+- OAuth logic that relies on external browser (Edge) instead of custom app logic
 - Adjustable layouts
 - Dynamically creating clickable links in TextBlocks bound to bodies of text
 - Extensibe use of x:Bind
 - Custom image loading from behind protected HTTP endpoints
 - Example of identical experience between Desktop and Mobile
 - Nested Frame navigation model
+- Image viewer logic that relies on built in Photos app instead of custom viewer
 - A usable stand-alone Yammer client
 - Async, async and more async
 - And hopefully much more
