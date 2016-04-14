@@ -1,0 +1,31 @@
+﻿<local:PageBase
+    x:Class="Yammer.App.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Yammer.App"
+    Title="SETTINGS">
+    <Grid Padding="20" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel>
+            <TextBlock Padding="0 0 0 10" Text="Account" Style="{StaticResource TitleTextBlockStyle}" />
+            <Grid Margin="10 0 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" CacheMode="BitmapCache" Source="{x:Bind Path=Model.CurrentUser.MugshotUrl, Mode=OneWay}" Width="48" Height="48" />
+                <StackPanel Grid.Column="1" Margin="10 0 10 0" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind Path=Model.CurrentUser.FullName, Mode=OneWay, FallbackValue='Full Name'}" Style="{StaticResource SenderNameStyle}" />
+                    <!--<TextBlock Text="{x:Bind Path=Model.CurrentUser.NetworkName, Mode=OneWay, FallbackValue=Company}" Style="{StaticResource SecondaryNameStyle}" />-->
+                    <HyperlinkButton Content="Log out" Click="Logout_Click" />
+                </StackPanel>
+            </Grid>
+            <TextBlock Padding="0 10" Text="Theme" Style="{StaticResource TitleTextBlockStyle}" />
+            <StackPanel Margin="10 0 0 0">
+                <RadioButton x:Name="LightTheme" GroupName="Theme" Content="Light" />
+                <RadioButton x:Name="DarkTheme" GroupName="Theme" IsEnabled="False" Content="Dark" />
+                <RadioButton x:Name="SystemTheme" GroupName="Theme" IsEnabled="False" Content="System" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</local:PageBase>

@@ -1,0 +1,137 @@
+﻿<local:PageBase
+    x:Class="Yammer.App.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Yammer.App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Yammer.API.Models"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+    <local:PageBase.Resources>
+        <CollectionViewSource x:Key="NetworksCollectionView" Source="{x:Bind Path=Model.Networks, Mode=OneWay}" />
+    </local:PageBase.Resources>
+    <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Default">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplitView.DisplayMode" Value="Inline" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="True" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplitView.DisplayMode" Value="Overlay" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="False" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <AppBarButton Click="Hamburger_Click" Style="{StaticResource SquareAppBarButtonStyle}">
+                        <FontIcon Glyph="&#xE700;" />
+                    </AppBarButton>
+                    <TextBlock Margin="10 0 0 0" Text="{Binding ElementName=MainFrame, Path=Content.Title, Mode=OneWay, FallbackValue=TITLE, Converter={StaticResource UpperCaseConverter}}" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                </StackPanel>
+                <HyperlinkButton Padding="0 0 20 0" Click="GitHubLink_Click" HorizontalAlignment="Right">
+                    <TextBlock Text="GitHub" />
+                </HyperlinkButton>
+                <Rectangle Fill="{ThemeResource SystemControlForegroundChromeHighBrush}" Height="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+            </Grid>
+            <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240">
+                <SplitView.Pane>
+                    <Grid x:Name="SplitViewPaneGrid" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+                        <Grid.Resources>
+                            <Style x:Key="NotificationRectangleStyle" TargetType="Rectangle">
+                                <Setter Property="Margin" Value="5 0 5 -5" />
+                                <Setter Property="Fill" Value="{StaticResource SystemControlBackgroundAccentBrush}" />
+                                <Setter Property="Height" Value="2" />
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="VerticalAlignment" Value="Bottom" />
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ComboBox Grid.Row="0" Margin="10" ItemsSource="{Binding Source={StaticResource NetworksCollectionView}}" DisplayMemberPath="Name" HorizontalAlignment="Stretch" SelectionChanged="ActiveNetwork_Changed" Visibility="{x:Bind Path=Model.Networks, Mode=OneWay, Converter={StaticResource CollectionVisibilityConverter}}" />
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <AppBarButton Click="Home_Click" ToolTipService.ToolTip="My Feed" Style="{StaticResource SquareAppBarButtonStyle}">
+                                <SymbolIcon Symbol="Home" />
+                            </AppBarButton>
+                            <AppBarButton Click="Inbox_Click" ToolTipService.ToolTip="Inbox" Style="{StaticResource SquareAppBarButtonStyle}">
+                                <Grid>
+                                    <SymbolIcon Symbol="Mail" />
+                                    <Rectangle Style="{StaticResource NotificationRectangleStyle}" Visibility="{x:Bind Path=Model.Network.InboxUnseenThreadCount, Mode=OneWay, FallbackValue=Collapsed, Converter={StaticResource NonZeroValueVisiblityConverter}}" />
+                                </Grid>
+                            </AppBarButton>
+                            <AppBarButton IsEnabled="False" Click="Notifications_Click" ToolTipService.ToolTip="Notifications" Style="{StaticResource SquareAppBarButtonStyle}">
+                                <Grid>
+                                    <FontIcon Glyph="&#xEA8F;" Style="{StaticResource SegoeAssetsStyle}" />
+                                    <Rectangle Style="{StaticResource NotificationRectangleStyle}" Visibility="{x:Bind Path=Model.Network.UnseenNotificationCount, Mode=OneWay, FallbackValue=Collapsed, Converter={StaticResource NonZeroValueVisiblityConverter}}" />
+                                </Grid>
+                            </AppBarButton>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Margin="10 10 10 0" Orientation="Horizontal">
+                            <SymbolIcon Foreground="Gray" Symbol="People" />
+                            <TextBlock Margin="10 0 0 0" Foreground="Gray" Text="Groups" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <ListView Grid.Row="3" x:Name="GroupsListView" ItemsSource="{x:Bind Path=Model.MyGroups, Mode=OneWay}" SelectionChanged="Groups_SelectionChanged" SelectionMode="Single">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="Padding" Value="15 0 20 0" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Group">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{x:Bind Path=FullName}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" />
+                                        <FontIcon Grid.Column="1" Glyph="&#xE915;" Foreground="{StaticResource SystemControlForegroundAccentBrush}" Style="{StaticResource SegoeAssetsStyle}" Visibility="{x:Bind Path=UnreadCount, Converter={StaticResource NonZeroValueVisiblityConverter}}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.Column="0" CacheMode="BitmapCache" Source="{x:Bind Path=Model.CurrentUser.MugshotUrl, Mode=OneWay}" Width="48" Height="48" />
+                            <StackPanel Grid.Column="1" Margin="10 0 10 0" VerticalAlignment="Center">
+                                <TextBlock Text="{x:Bind Path=Model.CurrentUser.FullName, Mode=OneWay, FallbackValue='Full Name'}" Style="{StaticResource SenderNameStyle}" />
+                                <!--<TextBlock Text="{x:Bind Path=Model.CurrentUser.NetworkName, Mode=OneWay, FallbackValue=Company}" Style="{StaticResource SecondaryNameStyle}" />-->
+                            </StackPanel>
+                            <AppBarButton Grid.Column="2" Click="Settings_Click" Style="{StaticResource SquareAppBarButtonStyle}" VerticalAlignment="Center">
+                                <SymbolIcon Symbol="Setting" />
+                            </AppBarButton>
+                        </Grid>
+                        <Rectangle Grid.RowSpan="4" Fill="{ThemeResource SystemControlForegroundChromeHighBrush}" Width="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" />
+                    </Grid>
+                </SplitView.Pane>
+                <Frame x:Name="MainFrame" SourcePageType="local:MyFeedPage" CacheSize="2" />
+            </SplitView>
+        </Grid>
+    </Grid>
+</local:PageBase>

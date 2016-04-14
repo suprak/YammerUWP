@@ -1,0 +1,166 @@
+﻿<ResourceDictionary
+    x:Class="Yammer.App.MessageTemplateResources"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Yammer.App"
+    xmlns:models="using:Yammer.API.Models">
+    <DataTemplate x:Key="LikeSwipeTemplate" x:DataType="models:Message">
+        <Grid Padding="40 0" Background="{StaticResource SystemControlBackgroundAccentBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <SymbolIcon Grid.Column="0" Margin="0 0 10 0" Symbol="Like" Foreground="White" />
+            <TextBlock Grid.Column="1" Text="Like" Foreground="White" VerticalAlignment="Center" Visibility="{x:Bind Path=IsLiked, Mode=OneWay, Converter={StaticResource BooleanVisibilityConverter}, ConverterParameter=!}" />
+            <TextBlock Grid.Column="1" Text="UnLike" Foreground="White" VerticalAlignment="Center" Visibility="{x:Bind Path=IsLiked, Mode=OneWay, Converter={StaticResource BooleanVisibilityConverter}}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ReplyMessageButtonTemplate" x:DataType="models:Message">
+        <Button Padding="3" Background="Transparent" BorderThickness="0" Click="ReplyToMessage_Click" Tag="{x:Bind}" Style="{StaticResource SimpleButtonStyle}">
+            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE15F;" />
+        </Button>
+    </DataTemplate>
+
+    <DataTemplate x:Key="LikeMessageButtonTemplate" x:DataType="models:Message">
+        <ToggleButton Padding="3" Background="Transparent" BorderThickness="0" IsChecked="{x:Bind Path=IsLiked, Mode=OneWay, Converter={StaticResource NullableBoolConverter}}" Click="LikeMessage_Click" Tag="{x:Bind}" Style="{StaticResource SimpleToggleButtonStyle}">
+            <SymbolIcon Symbol="Like" />
+        </ToggleButton>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ImageAttachmentTemplate" x:DataType="models:ImageAttachment">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0" local:PrivateImageService.Source="{x:Bind Path=ThumbnailUrl}" />
+            <ProgressBar Grid.Row="1" Background="Transparent" IsIndeterminate="{x:Bind Path=IsBusy, Mode=OneWay}" Visibility="{x:Bind Path=IsBusy, Mode=OneWay, Converter={StaticResource BooleanVisibilityConverter}}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ImageAttachmentsViewTemplate" x:DataType="models:Message">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ListView ItemsSource="{x:Bind Path=ImageAttachments}" ItemClick="ImageAttachment_Click">
+                <ListView.Style>
+                    <!-- Based on MessagesListViewStyle style -->
+                    <Style TargetType="ListView">
+                        <Setter Property="SelectionMode" Value="None" />
+                        <Setter Property="IsItemClickEnabled" Value="True" />
+                        <Setter Property="IsSwipeEnabled" Value="False" />
+                        <Setter Property="IsDoubleTapEnabled" Value="False" />
+                        <Setter Property="IsHoldingEnabled" Value="False" />
+                        <Setter Property="IsMultiSelectCheckBoxEnabled" Value="False" />
+                        <Setter Property="IncrementalLoadingTrigger" Value="Edge" />
+                        <Setter Property="ItemsPanel">
+                            <Setter.Value>
+                                <ItemsPanelTemplate>
+                                    <ItemsStackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="ItemTemplate" Value="{StaticResource ImageAttachmentTemplate}" />
+                        <Setter Property="ItemContainerStyle">
+                            <Setter.Value>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="Padding" Value="5" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Top" />
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.Style>
+            </ListView>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MessageAttachmentTemplate" x:DataType="models:Message">
+        <Grid Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}" BorderBrush="{ThemeResource SystemControlForegroundChromeHighBrush}" BorderThickness="1" Padding="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="{x:Bind Path=MessageAttachment.ContentExcerpt}" TextWrapping="Wrap" />
+            <HyperlinkButton Grid.Row="1" Content="View Conversation" Click="AttachedConversationLink_Click" Tag="{x:Bind Path=MessageAttachment}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MessageDataTemplate" x:DataType="models:Message">
+        <local:SwipeableControl LeftContent="{x:Bind}" LeftTemplate="{StaticResource LikeSwipeTemplate}" Tag="{x:Bind}" SwipedLeft="Message_SwipedLeft" SwipedRight="Message_SwipedRight">
+            <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Ellipse Margin="20 10 10 0" VerticalAlignment="Top" Style="{StaticResource MugshotStyle}">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="{x:Bind Path=Sender.MugshotUrl}" />
+                    </Ellipse.Fill>
+                </Ellipse>
+                <StackPanel Grid.Column="1" Grid.Row="0" Margin="0 10 20 0">
+                    <TextBlock Text="{x:Bind Path=Sender.FullName}" Style="{StaticResource SenderNameStyle}" />
+                    <TextBlock Foreground="{x:Bind Path=Group.Color, FallbackValue=Gray}" Text="{x:Bind Path=Group.FullName, FallbackValue='All Company'}" Style="{StaticResource GroupNameStyle}" />
+                </StackPanel>
+                <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="20 5 20 0" local:TextBlockService.FormattedText="{x:Bind Path=Body.Smart}" TextWrapping="Wrap" />
+                <ContentControl Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Margin="20 5 20 0" Content="{x:Bind}" ContentTemplate="{StaticResource MessageAttachmentTemplate}" Visibility="{x:Bind Path=MessageAttachment, FallbackValue=Collapsed, Converter={StaticResource ObjectVisiblityConverter}}" />
+                <ContentControl Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Margin="20 5 20 0" Content="{x:Bind}" ContentTemplate="{StaticResource ImageAttachmentsViewTemplate}" Visibility="{x:Bind Path=SupportedAttachments, FallbackValue=Collapsed, Converter={StaticResource CollectionVisibilityConverter}}" />
+                <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Margin="20 5 20 0" Foreground="Gray" FontSize="11" Text="{x:Bind Path=TimeSinceLatestActivity, Mode=OneWay, FallbackValue='1 minute ago', Converter={StaticResource TimeSinceNowConverter}}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Grid.Row="4" Margin="0 5 20 0" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Padding="10 0 5 0" Foreground="Gray" FontSize="11" Text="{x:Bind Path=SupportedAttachments, FallbackValue='0', Converter={StaticResource CollectionLengthConverter}}" VerticalAlignment="Center" />
+                    <SymbolIcon Symbol="Attach" />
+                    <TextBlock Padding="10 0 2 0" Foreground="Gray" FontSize="11" Text="{x:Bind Path=Thread.Stats.AdjustedUpdates, Mode=OneWay, FallbackValue='0'}" VerticalAlignment="Center" />
+                    <ContentControl Content="{x:Bind}" ContentTemplate="{StaticResource ReplyMessageButtonTemplate}" />
+                    <TextBlock Padding="10 0 2 0" Foreground="Gray" FontSize="11" Text="{x:Bind Path=LikedBy.Count, Mode=OneWay, FallbackValue='0'}" VerticalAlignment="Center" />
+                    <ContentControl Content="{x:Bind}" ContentTemplate="{StaticResource LikeMessageButtonTemplate}" />
+                </StackPanel>
+                <Rectangle Grid.Row="5" Grid.ColumnSpan="2" Margin="0 10 0 0" Fill="{ThemeResource SystemControlForegroundChromeHighBrush}" Height="1" HorizontalAlignment="Stretch" />
+            </Grid>
+        </local:SwipeableControl>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MessagesFooterDataTemplate" x:DataType="local:MessagesViewModel">
+        <Button Padding="10" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" BorderThickness="0" Click="LoadMoreItems_Click" HorizontalAlignment="Stretch" Tag="{x:Bind}">
+            <SymbolIcon Symbol="More" />
+        </Button>
+    </DataTemplate>
+
+    <Style x:Key="MessagesListViewStyle" TargetType="ListView">
+        <Setter Property="SelectionMode" Value="None" />
+        <Setter Property="IsItemClickEnabled" Value="True" />
+        <Setter Property="IsSwipeEnabled" Value="False" />
+        <Setter Property="IsDoubleTapEnabled" Value="False" />
+        <Setter Property="IsHoldingEnabled" Value="False" />
+        <Setter Property="IsMultiSelectCheckBoxEnabled" Value="False" />
+        <Setter Property="IncrementalLoadingTrigger" Value="Edge" />
+        <Setter Property="ItemTemplate" Value="{StaticResource MessageDataTemplate}" />
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <ContentPresenter Padding="{TemplateBinding Padding}" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FooterTemplate" Value="{StaticResource MessagesFooterDataTemplate}" />
+    </Style>
+</ResourceDictionary>

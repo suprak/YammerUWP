@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+  <Identity Name="7650KarpusSoftware.YamJam" Publisher="CN=F812D811-E081-4510-B518-8709AE633AD8" Version="1.3.0.0" />
+  <mp:PhoneIdentity PhoneProductId="ff8ec936-54f5-4960-9282-a7196a23b9fc" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Properties>
+    <DisplayName>Yam</DisplayName>
+    <PublisherDisplayName>Kuartz Software</PublisherDisplayName>
+    <Logo>Assets\YammerStoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="YammerApp.App">
+      <uap:VisualElements DisplayName="Yam" Square150x150Logo="Assets\YammerMedTile.png" Square44x44Logo="Assets\YammerAppList.png" Description="A universal Windows client for Yammer." BackgroundColor="#0099C8">
+        <uap:DefaultTile Wide310x150Logo="Assets\YammerWideTile.png" Square71x71Logo="Assets\YammerSmallTile.png" Square310x310Logo="Assets\YammerLargeTile.png">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo" />
+            <uap:ShowOn Tile="wide310x150Logo" />
+            <uap:ShowOn Tile="square310x310Logo" />
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\YammerSplashScreen.png" BackgroundColor="#0099C8" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="portrait" />
+          <uap:Rotation Preference="landscape" />
+          <uap:Rotation Preference="portraitFlipped" />
+          <uap:Rotation Preference="landscapeFlipped" />
+        </uap:InitialRotationPreference>
+      </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="yam" />
+        </uap:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <Capability Name="privateNetworkClientServer" />
+  </Capabilities>
+</Package>
